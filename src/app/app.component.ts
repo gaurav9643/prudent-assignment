@@ -24,16 +24,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDictionary();
-    this.results$ = this.subject.pipe(
-      debounceTime(1000),
-      map((searchText: any) => {
-        return this.utility.wordAutoCorrect(searchText, this.dictionary);
-      })
-    );
-    this.results$.subscribe((result) => {
-      this.suggestions = result;
-      this.clearResults();
-    });
+    this.handleFiltering();
     this.endIndex = this.limit;
   }
 
@@ -46,6 +37,24 @@ export class AppComponent implements OnInit {
         this.dictionary = [];
         console.log(_err);
       },
+    });
+  }
+
+  handleFiltering(): void {
+    this.results$ = this.subject.pipe(
+      debounceTime(1000),
+      map((searchText: any) => {
+        let result = [];
+        result = this.utility.wordAutoCorrect(searchText, this.dictionary);
+        if(!result.length){
+          result = this.utility.correctAdjacentletter(searchText, this.dictionary)
+        }
+        return result;
+      })
+    );
+    this.results$.subscribe((result) => {
+      this.suggestions = result;
+      this.clearResults();
     });
   }
 
