@@ -28,6 +28,9 @@ export class AppComponent implements OnInit {
     this.endIndex = this.limit;
   }
 
+  /**
+   * Method (loadDictionary) : load dictionary from external resources example:- JSON, API
+   */
   loadDictionary(): void {
     this._http.get('./assets/dictionary.json').subscribe({
       next: (response: any) => {
@@ -40,6 +43,9 @@ export class AppComponent implements OnInit {
     });
   }
 
+  /**
+   * Method (handleFiltering) : handle the filtering wait for 1 sec to recall the filter funtion as filter call is costly.
+   */
   handleFiltering(): void {
     this.results$ = this.subject.pipe(
       debounceTime(1000),
@@ -61,6 +67,10 @@ export class AppComponent implements OnInit {
     });
   }
 
+  /**
+   * Method (onValueChange) : Handle textbox input event
+   * @param $event
+   */
   onValueChange($event: any): void {
     const term = $event.target.value;
     if (term !== '') this.subject.next(term);
@@ -70,11 +80,17 @@ export class AppComponent implements OnInit {
     }
   }
 
+  /**
+   * Method (loadWords) : called on vertical scroll & append the elements based on start & end Index.
+   */
   loadWords(): void {
     const display = this.suggestions.slice(this.startIndex, this.endIndex);
     this.display.push(...display);
   }
 
+  /**
+   * Method (onScroll) : called on vertical scroll & set start & end Index fror pagination.
+   */
   onScroll() {
     if (this.display.length < this.suggestions.length) {
       this.startIndex = this.endIndex;
@@ -83,6 +99,9 @@ export class AppComponent implements OnInit {
     }
   }
 
+  /**
+   * Method (clearResults) : Reset the inifinite scroll parameters.
+   */
   clearResults(): void {
     this.startIndex = 0;
     this.endIndex = this.limit;
