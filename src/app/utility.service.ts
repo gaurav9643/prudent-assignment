@@ -35,11 +35,22 @@ const adjacentWords: any = {
 export class UtilsService {
   constructor() {}
 
+  /**
+   * Method (wordAutoCorrect): Return matching words based on term.
+   * Rules 1 : if word startWith term
+   * Rules 2 : if word has dash, slash or apostrophe ignored by method and compare with term.
+   * Rules 3 : if term has duplicate letters it handle and return matching letter.
+   * @param term string
+   * @param dictionary string[]
+   * @returns string[]
+   */
   wordAutoCorrect(term: string, dictionary: string[]): string[] {
     let result: string[] = [];
     let matchedWords: string[] = [];
     let adjacentWords: string[] = [];
-    adjacentWords = this.correctAdjacentletter(term, dictionary, 'find');
+    let duplicates: string[] = [];
+
+    //adjacentWords = this.advancedAutoCorrect(term, dictionary, 'find');
     matchedWords = dictionary.filter((word: string) => {
       let isMatch = this.matchWord(word, term);
       if (!isMatch) {
@@ -47,6 +58,13 @@ export class UtilsService {
           const _word = word.replace(/['-/]/, '');
           isMatch = this.matchWord(_word, term);
         } else {
+          if (!duplicates.length) {
+            let termSplit: string[] = term.toLowerCase().split('');
+            duplicates = termSplit.filter(
+              (value, index, self) => self.indexOf(value) === index
+            );
+          }
+          isMatch = this.handleDublicates(word, term, duplicates);
         }
       }
       return isMatch;
@@ -56,31 +74,74 @@ export class UtilsService {
     return result;
   }
 
+  /**
+   * Method (matchWord): return true if str1 start with str2.
+   * @param str1 string
+   * @param str2 string
+   * @returns boolean
+   */
   matchWord(str1: string, str2: string): boolean {
     return str1.toLowerCase().startsWith(str2.toLowerCase());
   }
 
-  correctAdjacentletter(
+  /**
+   * Method (handleDublicates): handle duplicates & return true or false if term match with word.
+   * @param word string
+   * @param term string
+   * @param duplicates string[]
+   * @returns boolean
+   */
+  handleDublicates(word: string, term: string, duplicates: string[]): boolean {
+    let result: boolean = false;
+    duplicates.every((char) => {
+      let termSplit: string[] = term.toLowerCase().split('');
+      const _index = termSplit.indexOf(char);
+      if (_index !== -1) {
+        termSplit.splice(_index, 1);
+        result = word.toLowerCase() == termSplit.join('').toLowerCase();
+        if (result) return false;
+      }
+      return true;
+    });
+    return result;
+  }
+
+  /**
+   * Method (advancedAutoCorrect): return list word based on term.
+   * Rules 1 : Correct adjacent letters
+   * Rules 2 : Transposing letters
+   * @param term  string
+   * @param dictionary  string[]
+   * @param method string
+   * @returns  string[]
+   */
+  advancedAutoCorrect(
     term: string,
     dictionary: string[],
     method: string = 'filter'
   ): string[] {
-    let result: string[] | string = [];
+    let result: string[] = [];
     const _equalLengthWords = this.getAllWordsEqualLength(dictionary, term);
     if (_equalLengthWords.length) {
       result = this.identifyAdjacentLetter(
         _equalLengthWords,
-        adjacentWords,
-        term,
+        term.toLowerCase(),
         method
       );
     }
     return result;
   }
 
+  /**
+   * Method (identifyAdjacentLetter) : method is identify Adjacent & Transposing letters.
+   * @param words string
+   * @param adjacentWords Object
+   * @param term string
+   * @param method string
+   * @returns string[]
+   */
   identifyAdjacentLetter(
     words: any,
-    adjacentWords: any,
     term: string,
     method: string
   ): string[] {
@@ -91,24 +152,50 @@ export class UtilsService {
       for (let i = 0; i < _length; i++) {
         let letter = term.charAt(i);
         let replacedLetter = adjacentWords[letter];
-        if (replacedLetter.length > 1) {
+        if (replacedLetter && replacedLetter.length > 1) {
           replacedLetter.forEach((ele: any) => {
             const replaced = term.replace(term[i], ele);
             if (replaced == word) {
-              result.push(replaced);
+              isMatch = this.matchWord(replaced, word);
             }
           });
-          if (result.length == 1) {
-            isMatch = true;
-          }
         }
       }
+      if (!isMatch)
+        isMatch = this.containsSameLetters(
+          word.toLowerCase(),
+          term.toLowerCase()
+        );
       return isMatch;
     });
     return Array.isArray(result) ? result : [result];
   }
 
+  /**
+   * Method (getAllWordsEqualLength) : filter the list based on term length;
+   * @param list string[]
+   * @param term string
+   * @returns string[]
+   */
   getAllWordsEqualLength(list: string[], term: string): string[] {
     return list.filter((word) => word.length == term.length);
+  }
+
+  /**
+   * Method (containsSameLetters) : return true if str1 letter exist in str2.
+   * @param str1 string
+   * @param str2 string
+   * @returns boolean
+   */
+  containsSameLetters(str1: string, str2: string): boolean {
+    const letters = [...str1];
+    return [...str2].every((x) => {
+      var index = letters.indexOf(x);
+      if (~index) {
+        letters.splice(index, 1);
+        return true;
+      }
+      return false;
+    });
   }
 }

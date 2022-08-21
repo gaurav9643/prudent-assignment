@@ -46,8 +46,11 @@ export class AppComponent implements OnInit {
       map((searchText: any) => {
         let result = [];
         result = this.utility.wordAutoCorrect(searchText, this.dictionary);
-        if(!result.length){
-          result = this.utility.correctAdjacentletter(searchText, this.dictionary)
+        if (!result.length) {
+          result = this.utility.advancedAutoCorrect(
+            searchText,
+            this.dictionary
+          );
         }
         return result;
       })
