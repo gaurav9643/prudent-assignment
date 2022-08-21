@@ -19,8 +19,8 @@ describe('UtilsService', () => {
     expect(word).toBe('A');
   });
 
-  it('should return word undefined', () => {
+  it('should return empty array', () => {
     const word = service.wordAutoCorrect('D', ['A', 'B', 'C']);
-    expect(word).toBe(undefined);
+    expect(word).toBe([]);
   });
 });

@@ -1,11 +1,15 @@
 <div class="__prudent_container">
   <div class="__prudent_inner_container">
-    <h1 class="__prudent_heading">Prudent Assignment</h1>
+    <h1 class="__prudent_heading">Prudent Assignment <b *ngIf="suggestions.length">(suggested : {{suggestions.length}}
+        words)</b></h1>
     <div class="__prudent_control">
       <input type="text" [(ngModel)]="term" (input)="onValueChange($event)">
     </div>
-    <div class="__prudent_suggestions" *ngIf="suggestions">
-      <a class="__prudent_suggested_word" href="javascript:void(0)">{{suggestions}}</a>
+    <div class="__prudent_suggestions" infinite-scroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="50"
+      [horizontal]="true"  [scrollWindow]="false" (scrolled)="onScroll()">
+      <ng-container *ngFor="let word of display">
+        <a class="__prudent_suggested_word" href="javascript:void(0)">{{word}}</a>
+      </ng-container>
     </div>
   </div>
 </div>

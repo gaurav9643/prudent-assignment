@@ -26,13 +26,13 @@
   font-size: 20px;
   color: #494949;
 }
-.__prudent_suggestions{
-    width: 50%;
-    overflow: auto hidden;
-    margin: 20px 0px;
-    height: 20px;
-    text-align: center;
+.__prudent_suggestions {
+  width: 50%;
+  overflow: auto hidden;
+  margin: 20px 0px;
+  height: 50px;
+  text-align: center;
 }
-.__prudent_suggested_word{
-    padding: 10px;
+.__prudent_suggested_word {
+  padding: 10px;
 }
